@@ -1,36 +1,37 @@
 <template lang="pug">
-table.table
-  thead
-    tr
-      th
-      th(v-for='i in getIter()')
-        b {{i}}
-  tbody
-    tr(v-for='row in getIter()')
-      td.left-index
-        b {{row}}
-      td(v-for="col in getIter()")
-        input(type="text" :value="getItem(row, col)" :disabled='!isEditable(row, col)')
-        //- span(v-else) {{getItem(row, col)}}
+b-col(cols=12)
+  b-card(header='Adjacency Matrix')
+    table.table
+      thead
+        tr
+          th
+          th(v-for='i in 10')
+            b {{i}}
+      tbody
+        tr(v-for='row in 10')
+          td.left-index
+            b {{row}}
+          td(v-for="col in 10")
+            input(
+              type="text"
+              :value="data[row-1][col-1]"
+              :disabled='!isEditable(row, col)'
+              @input='setField($event, row-1, col-1)'
+              )
 </template>
 
 <script>
-import Matrix from './graph-util'
 export default {
   name: 'matView',
   data: () => ({
-    mat: new Matrix(10)
   }),
   methods: {
-    getIter() {
-      return this.$data.mat.getIterator()
-    },
-    getItem(i, j) {
-      return this.$data.mat.getMatrixMember(i, j)
+    setField(e, i, j) {
+      this.$emit('set', i, j, e.target.value)
     },
     isEditable(i,j) {
-      return this.$data.mat.isEditableMember(i,j)
-    }
+      return i <= j
+    },
   },
   props: ['data']
 }
@@ -38,8 +39,8 @@ export default {
 
 <style lang="sass" scoped>
 table
-  margin: 0px 5%
-  width: 90%
+  // margin: 0px 5%
+  // width: 90%
 
 td.left-index
   border-right: 1px solid #ccc

@@ -1,18 +1,28 @@
 <template lang="pug">
-  div
-    div#target
-    mat-view
+  b-container
+    graph-view(:mat='mat')
+    br
+    b-row
+      mat-view(:data='mat' @set='setField')
 </template>
 
 <script>
 import MatView from './matView'
-import Matrix from './graph-util'
+import GraphView from './graphView'
+import {createMatrix, getIterator, setMember} from './graph-util'
 export default {
   name: 'PetersonApp',
-  components: {MatView},
+  components: {MatView, GraphView},
   data: () => ({
-    mat: new Matrix(10)
-  })
+    mat: createMatrix(10)
+  }),
+  methods: {
+    setField (i, j, v) {
+      this.$data.mat[i][j] = v
+      this.$data.mat[j][i] = v
+      this.$data.mat = Array(...this.$data.mat)
+    }
+  }
 }
 </script>
 
