@@ -16,6 +16,18 @@
                 b {{i}}
               td
                 input(v-model.number='radius[Number(i)-1]' @input='redraw')
+    b-modal(
+      :title='"Edge Value "+(edgeModalNodes[0]+1)+" to "+(edgeModalNodes[1]+1)'
+      v-model='showEdgeModal'
+      @ok='setEdgeVal'
+      )
+      input.form-control(v-model='edgeModalVal')
+    b-modal(
+      :title='"Node Radius "+(radModalNodeNum+1)'
+      v-model='showRadModal'
+      @ok='setNodeVal'
+    )
+      input.form-control(v-model='radModalVal')
 </template>
 
 <script>
@@ -27,7 +39,14 @@ export default {
   data: () => ({
     matrix: this.mat,
     colors: [],
-    radius: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+    radius: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+    showRadModal: false,
+    showEdgeModal: false,
+    radModalVal: 10,
+    radModalIdx: 0,
+    edgeModalVal: '',
+    radModalNodeNum: 0,
+    edgeModalNodes: [3, 5]
   }),
   methods: {
     initStar () {
@@ -43,34 +62,64 @@ export default {
       svg.selectAll('line')
         .data(edgeset)
         .enter().append('line')
+        .classed('p-edge', true)
         .attr('x1', (d, i) => nodeset[d[0]].x)
         .attr('y1', (d, i) => nodeset[d[0]].y)
         .attr('x2', (d, i) => nodeset[d[1]].x)
         .attr('y2', (d, i) => nodeset[d[1]].y)
         .attr('stroke', (d, i) => d[2])
-        .attr('stroke-width', '2')
-        .attr('stroke-dasharray', (d, i) => d[3] ? '' : '3, 3')
+        .attr('stroke-width', '4')
+        .attr('stroke-dasharray', (d, i) => d[3] ? '' : '8, 3')
+        .on('click', (d, i) => {
+          console.log('setEdge', defaultMap[d[0]], defaultMap[d[1]])
+          this.$data.edgeModalNodes = [defaultMap[d[0]], defaultMap[d[1]]]
+          this.$data.edgeModalVal = this.mat[defaultMap[d[0]]][defaultMap[d[1]]]
+          this.$data.showEdgeModal = true
+        })
 
       svg.selectAll('circle')
         .data(nodeset)
         .enter().append('circle')
+        .classed('p-node', true)
         .attr('cx', (d, i) => d.x)
         .attr('cy', (d, i) => d.y)
         .attr('fill', (d, i) => this.$data.radius[defaultMap[i]] > 0 ? 'skyblue' : 'pink')
         .attr('r', (d, i) => Math.abs(this.$data.radius[defaultMap[i]]))
+        .on('click', (d, i) => {
+          console.log('setNode', defaultMap[i])
+          this.$data.radModalNodeNum = defaultMap[i]
+          this.$data.radModalIdx = i
+          this.$data.radModalVal = this.$data.radius[defaultMap[i]]
+          this.$data.showRadModal = true
+        })
 
       svg.selectAll('text')
         .data(nodeset)
         .enter().append('text')
+        .classed('p-node', true)
         .text((d, i) => defaultMap[i]+1)
         .attr('x', (d, i) => d.x)
         .attr('y', (d, i) => d.y+5)
         .attr('font-weight', 'bold')
         .attr('text-anchor', 'middle')
+        .on('click', (d, i) => {
+          console.log('setNode', defaultMap[i])
+          this.$data.radModalNodeNum = defaultMap[i]
+          this.$data.radModalIdx = i
+          this.$data.radModalVal = this.$data.radius[defaultMap[i]]
+          this.$data.showRadModal = true
+        })
     },
     redraw () {
       this.initStar()
       this.drawStar()
+    },
+    setEdgeVal () {
+      this.$emit('set', ...this.$data.edgeModalNodes, this.$data.edgeModalVal)
+    },
+    setNodeVal () {
+      this.$data.radius[this.$data.radModalNodeNum] = this.$data.radModalVal
+      this.redraw()
     }
   },
   mounted () {
@@ -78,6 +127,13 @@ export default {
   },
   watch: {
     $props: {
+      handler () {
+        this.initStar()
+        this.drawStar()
+      },
+      deep: true
+    },
+    radius: {
       handler () {
         this.initStar()
         this.drawStar()
@@ -91,10 +147,12 @@ export default {
 <style lang="sass">
 #target
   text-align: center
+
 span.color-legend
   color: white
   padding: 0 10px
   border-radius: 4px
+
 .color-group
   display: flex
   &>div
@@ -104,6 +162,14 @@ span.color-legend
     margin: 0 5px
     .color-legend
       margin-left: 4px
+
+.p-edge:hover
+  opacity: 0.5
+
+.p-node:hover
+  opacity: 0.5
+  border: 2px solid red
+
 table.rad-list
   td
     vertical-align: middle

@@ -1,6 +1,6 @@
 <template lang="pug">
   b-container
-    graph-view(:mat='mat')
+    graph-view(:mat='mat' @set='setField')
     br
     b-row
       mat-view(:data='mat' @set='setField')
