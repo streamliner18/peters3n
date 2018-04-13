@@ -48,15 +48,19 @@ export function petersenRelPos(inner, outer, x=0, y=0) {
 
 function mapColor (map, key) {
   let colors = ['red', 'green', 'blue', 'fuchsia', 'orange', 'cyan', 'yellow', 'black']
-  if (key === '' || key === '0') return '#eee'
-  if (key in map) return map[key]
+  let k = (key[0] === '-') ? key.slice(1) : key
+  if (k === '' || k === '0') return '#eee'
+  if (k in map) return map[k]
   else {
-    map[key] = colors[Object.keys(map).length]
-    return map[key]
+    map[k] = colors[Object.keys(map).length]
+    return map[k]
   }
 }
 
-export let defaultMap = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+// export let defaultMap = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+// [5, 6, 9, 2, 7, 8, 10, 4, 1, 3]
+export let defaultMap = [4, 5, 8, 1, 6, 7, 9, 3, 0, 2]
+
 
 export function edges (mat, mapping) {
   let res = []
@@ -66,7 +70,8 @@ export function edges (mat, mapping) {
     let matItem = mat[mapping[i]][mapping[targ]]
     res.push([
       i, targ,
-      mapColor(colors, matItem)
+      mapColor(colors, matItem),
+      matItem[0] === '-'
     ])
   }
   for (let i = 0; i < 5; i++) {
@@ -74,7 +79,18 @@ export function edges (mat, mapping) {
     let matItem = mat[mapping[i]][mapping[targ]]
     res.push([
       i, targ,
-      mapColor(colors, matItem)
+      mapColor(colors, matItem),
+      matItem[0] === '-'
+    ])
+  }
+  for (let i = 0; i < 5; i++) {
+    let orig = i+5
+    let targ = (i+1)%5+5
+    let matItem = mat[mapping[orig]][mapping[targ]]
+    res.push([
+      orig, targ,
+      mapColor(colors, matItem),
+      matItem[0] === '-'
     ])
   }
   return { res, colors }

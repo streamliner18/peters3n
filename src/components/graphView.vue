@@ -49,14 +49,24 @@ export default {
         .attr('y2', (d, i) => nodeset[d[1]].y)
         .attr('stroke', (d, i) => d[2])
         .attr('stroke-width', '2')
+        .attr('stroke-dasharray', (d, i) => d[3] ? '' : '3, 3')
 
       svg.selectAll('circle')
         .data(nodeset)
         .enter().append('circle')
         .attr('cx', (d, i) => d.x)
         .attr('cy', (d, i) => d.y)
-        .attr('fill', (d, i) => this.$data.radius[i] > 0 ? 'skyblue' : 'pink')
-        .attr('r', (d, i) => Math.abs(this.$data.radius[i]))
+        .attr('fill', (d, i) => this.$data.radius[defaultMap[i]] > 0 ? 'skyblue' : 'pink')
+        .attr('r', (d, i) => Math.abs(this.$data.radius[defaultMap[i]]))
+
+      svg.selectAll('text')
+        .data(nodeset)
+        .enter().append('text')
+        .text((d, i) => defaultMap[i]+1)
+        .attr('x', (d, i) => d.x)
+        .attr('y', (d, i) => d.y+5)
+        .attr('font-weight', 'bold')
+        .attr('text-anchor', 'middle')
     },
     redraw () {
       this.initStar()
