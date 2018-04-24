@@ -5,8 +5,8 @@
         div#target
         .color-group
           div(v-for='i in colors' :key='i[0]')
+            span.color-legend(:style='"background-color: "+i[1]')
             span {{i[0]}}
-            span.color-legend(:style='"background-color: "+i[1]') {{i[1]}}
     b-col(cols=4)
       b-card(header='Node Label and Radius')
         table.table.rad-list
@@ -150,19 +150,30 @@ export default {
 <style lang="sass">
 #target
   text-align: center
+  display: inline-block
 
 span.color-legend
   color: white
-  padding: 0 10px
-  border-radius: 4px
+  display: inline-block
+  width: 16px
+  height: 16px
+  vertical-align: middle
+  margin-right: 10px
+  border-radius: 50%
 
 .color-group
-  display: flex
+  display: inline-block
+  vertical-align: top
+  padding-top: 20px
   &>div
-    padding: 5px 10px
+    padding: 0px 10px
+    display: block
     border: 1px solid #eee
     border-radius: 3px
     margin: 0 5px
+    margin-top: 10px
+    font-size: 28px
+    font-weight: bold
     .color-legend
       margin-left: 4px
 
