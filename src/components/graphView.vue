@@ -22,14 +22,18 @@
       :title='"Edge Value "+(edgeModalNodes[0]+1)+" to "+(edgeModalNodes[1]+1)'
       v-model='showEdgeModal'
       @ok='setEdgeVal'
+      @shown='autoFocus("eFocus")'
+      ref='eForm' id='eForm'
       )
-      input.form-control(v-model='edgeModalVal')
+      input.form-control(v-model='edgeModalVal' ref='eFocus' @keyup='eSubmit')
     b-modal(
       :title='"Node Radius "+(radModalNodeNum+1)'
       v-model='showRadModal'
       @ok='setNodeVal'
+      @shown='autoFocus("rFocus")'
+      ref='rForm' id='rForm'
     )
-      input.form-control(v-model='radModalVal')
+      input.form-control(v-model='radModalVal' ref='rFocus' @keyup='rSubmit')
 </template>
 
 <script>
@@ -123,6 +127,21 @@ export default {
     setNodeVal () {
       this.$data.radius[this.$data.radModalNodeNum] = this.$data.radModalVal
       this.redraw()
+    },
+    autoFocus (el) {
+      this.$refs[el].focus()
+    },
+    eSubmit (e) {
+      if (e.keyCode === 13) {
+        this.$root.$emit('bv::hide::modal', 'eForm')
+        this.setEdgeVal()
+      }
+    },
+    rSubmit (e) {
+      if (e.keyCode === 13) {
+        this.$root.$emit('bv::hide::modal', 'rForm')
+        this.setNodeVal()
+      }
     }
   },
   mounted () {
