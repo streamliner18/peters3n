@@ -41,7 +41,7 @@ export default {
   data: () => ({
     matrix: this.mat,
     colors: [],
-    radius: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+    radius: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
     labels: defaultMap,
     showRadModal: false,
     showEdgeModal: false,
@@ -74,9 +74,9 @@ export default {
         .attr('stroke-width', '4')
         .attr('stroke-dasharray', (d, i) => d[3] ? '' : '8, 3')
         .on('click', (d, i) => {
-          console.log('setEdge', this.$data.labels[d[0]], this.$data.labels[d[1]])
-          this.$data.edgeModalNodes = [this.$data.labels[d[0]], this.$data.labels[d[1]]]
-          this.$data.edgeModalVal = this.mat[this.$data.labels[d[0]]][this.$data.labels[d[1]]]
+          console.log('setEdge', this.$data.labels[d[0]]-1, this.$data.labels[d[1]]-1)
+          this.$data.edgeModalNodes = [this.$data.labels[d[0]]-1, this.$data.labels[d[1]]-1]
+          this.$data.edgeModalVal = this.mat[this.$data.labels[d[0]]-1][this.$data.labels[d[1]]-1]
           this.$data.showEdgeModal = true
         })
 
@@ -86,13 +86,13 @@ export default {
         .classed('p-node', true)
         .attr('cx', (d, i) => d.x)
         .attr('cy', (d, i) => d.y)
-        .attr('fill', (d, i) => this.$data.radius[this.$data.labels[i]] > 0 ? 'skyblue' : 'pink')
-        .attr('r', (d, i) => Math.abs(this.$data.radius[this.$data.labels[i]]))
+        .attr('fill', (d, i) => this.$data.radius[this.$data.labels[i]-1] > 0 ? 'skyblue' : 'pink')
+        .attr('r', (d, i) => Math.abs(this.$data.radius[this.$data.labels[i]-1]))
         .on('click', (d, i) => {
-          console.log('setNode', this.$data.labels[i])
-          this.$data.radModalNodeNum = this.$data.labels[i]
+          console.log('setNode', this.$data.labels[i]-1)
+          this.$data.radModalNodeNum = this.$data.labels[i]-1
           this.$data.radModalIdx = i
-          this.$data.radModalVal = this.$data.radius[this.$data.labels[i]]
+          this.$data.radModalVal = this.$data.radius[this.$data.labels[i]-1]
           this.$data.showRadModal = true
         })
 
@@ -100,16 +100,16 @@ export default {
         .data(nodeset)
         .enter().append('text')
         .classed('p-node', true)
-        .text((d, i) => this.$data.labels[i]+1)
+        .text((d, i) => this.$data.labels[i])
         .attr('x', (d, i) => d.x)
         .attr('y', (d, i) => d.y+5)
         .attr('font-weight', 'bold')
         .attr('text-anchor', 'middle')
         .on('click', (d, i) => {
           console.log('setNode', this.$data.labels[i])
-          this.$data.radModalNodeNum = this.$data.labels[i]
+          this.$data.radModalNodeNum = this.$data.labels[i]-1
           this.$data.radModalIdx = i
-          this.$data.radModalVal = this.$data.radius[this.$data.labels[i]]
+          this.$data.radModalVal = this.$data.radius[this.$data.labels[i]-1]
           this.$data.showRadModal = true
         })
     },

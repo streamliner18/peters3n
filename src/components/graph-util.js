@@ -59,7 +59,8 @@ function mapColor (map, key) {
 
 // export let defaultMap = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 // [5, 6, 9, 2, 7, 8, 10, 4, 1, 3]
-export let defaultMap = [4, 5, 8, 1, 6, 7, 9, 3, 0, 2]
+// export let defaultMap = [4, 5, 8, 1, 6, 7, 9, 3, 0, 2]
+export let defaultMap = [5, 6, 9, 2, 7, 8, 10, 4, 1, 3]
 
 
 export function edges (mat, mapping) {
@@ -67,7 +68,7 @@ export function edges (mat, mapping) {
   let colors = {}
   for (let i = 0; i < 5; i++) {
     let targ = (i+3) % 5
-    let matItem = mat[mapping[i]][mapping[targ]]
+    let matItem = mat[mapping[i]-1][mapping[targ]-1]
     res.push([
       i, targ,
       mapColor(colors, matItem),
@@ -76,7 +77,7 @@ export function edges (mat, mapping) {
   }
   for (let i = 0; i < 5; i++) {
     let targ = i+5
-    let matItem = mat[mapping[i]][mapping[targ]]
+    let matItem = mat[mapping[i]-1][mapping[targ]-1]
     res.push([
       i, targ,
       mapColor(colors, matItem),
@@ -86,7 +87,7 @@ export function edges (mat, mapping) {
   for (let i = 0; i < 5; i++) {
     let orig = i+5
     let targ = (i+1)%5+5
-    let matItem = mat[mapping[orig]][mapping[targ]]
+    let matItem = mat[mapping[orig]-1][mapping[targ]-1]
     res.push([
       orig, targ,
       mapColor(colors, matItem),
