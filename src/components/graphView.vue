@@ -8,14 +8,16 @@
             span {{i[0]}}
             span.color-legend(:style='"background-color: "+i[1]') {{i[1]}}
     b-col(cols=4)
-      b-card(header='Node Radius')
+      b-card(header='Node Label and Radius')
         table.table.rad-list
           tbody
             tr(v-for='i in 10')
               td
                 b {{i}}
               td
-                input(v-model.number='radius[Number(i)-1]' @input='redraw')
+                input.node-conf(v-model.number='radius[Number(i)-1]' @input='redraw')
+              td
+                input.node-conf(v-model.number='labels[Number(i)-1]' @input='redraw')
     b-modal(
       :title='"Edge Value "+(edgeModalNodes[0]+1)+" to "+(edgeModalNodes[1]+1)'
       v-model='showEdgeModal'
@@ -40,6 +42,7 @@ export default {
     matrix: this.mat,
     colors: [],
     radius: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+    labels: defaultMap,
     showRadModal: false,
     showEdgeModal: false,
     radModalVal: 10,
@@ -56,7 +59,7 @@ export default {
     drawStar () {
       let svg = d3.select('#target').select('svg')
       let nodeset = petersenRelPos(100, 200, 250, 250)
-      let {res, colors} = edges(this.mat, defaultMap)
+      let {res, colors} = edges(this.mat, this.$data.labels)
       this.$data.colors = Object.keys(colors).map(i => [i, colors[i]])
       let edgeset = res
       svg.selectAll('line')
@@ -71,9 +74,9 @@ export default {
         .attr('stroke-width', '4')
         .attr('stroke-dasharray', (d, i) => d[3] ? '' : '8, 3')
         .on('click', (d, i) => {
-          console.log('setEdge', defaultMap[d[0]], defaultMap[d[1]])
-          this.$data.edgeModalNodes = [defaultMap[d[0]], defaultMap[d[1]]]
-          this.$data.edgeModalVal = this.mat[defaultMap[d[0]]][defaultMap[d[1]]]
+          console.log('setEdge', this.$data.labels[d[0]], this.$data.labels[d[1]])
+          this.$data.edgeModalNodes = [this.$data.labels[d[0]], this.$data.labels[d[1]]]
+          this.$data.edgeModalVal = this.mat[this.$data.labels[d[0]]][this.$data.labels[d[1]]]
           this.$data.showEdgeModal = true
         })
 
@@ -83,13 +86,13 @@ export default {
         .classed('p-node', true)
         .attr('cx', (d, i) => d.x)
         .attr('cy', (d, i) => d.y)
-        .attr('fill', (d, i) => this.$data.radius[defaultMap[i]] > 0 ? 'skyblue' : 'pink')
-        .attr('r', (d, i) => Math.abs(this.$data.radius[defaultMap[i]]))
+        .attr('fill', (d, i) => this.$data.radius[this.$data.labels[i]] > 0 ? 'skyblue' : 'pink')
+        .attr('r', (d, i) => Math.abs(this.$data.radius[this.$data.labels[i]]))
         .on('click', (d, i) => {
-          console.log('setNode', defaultMap[i])
-          this.$data.radModalNodeNum = defaultMap[i]
+          console.log('setNode', this.$data.labels[i])
+          this.$data.radModalNodeNum = this.$data.labels[i]
           this.$data.radModalIdx = i
-          this.$data.radModalVal = this.$data.radius[defaultMap[i]]
+          this.$data.radModalVal = this.$data.radius[this.$data.labels[i]]
           this.$data.showRadModal = true
         })
 
@@ -97,16 +100,16 @@ export default {
         .data(nodeset)
         .enter().append('text')
         .classed('p-node', true)
-        .text((d, i) => defaultMap[i]+1)
+        .text((d, i) => this.$data.labels[i]+1)
         .attr('x', (d, i) => d.x)
         .attr('y', (d, i) => d.y+5)
         .attr('font-weight', 'bold')
         .attr('text-anchor', 'middle')
         .on('click', (d, i) => {
-          console.log('setNode', defaultMap[i])
-          this.$data.radModalNodeNum = defaultMap[i]
+          console.log('setNode', this.$data.labels[i])
+          this.$data.radModalNodeNum = this.$data.labels[i]
           this.$data.radModalIdx = i
-          this.$data.radModalVal = this.$data.radius[defaultMap[i]]
+          this.$data.radModalVal = this.$data.radius[this.$data.labels[i]]
           this.$data.showRadModal = true
         })
     },
@@ -174,5 +177,8 @@ table.rad-list
   td
     vertical-align: middle
     padding: 10px 10px
+
+input.node-conf
+  width: 80px
 </style>
 
