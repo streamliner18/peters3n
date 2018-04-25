@@ -1,7 +1,24 @@
 <template lang="pug">
   b-row
+    b-col(cols=12)
+      b-navbar(variant='light')
+        b-navbar-brand Peters3n
+        b-navbar-nav
+          b-form-file(placeholder='Choose a file to load...' v-model='uploadFile')
+        b-navbar-nav
+          b-button(variant='primary' @click='uploadJSON') Load
+        b-navbar-nav
+          b-button(@click='downloadJSON') Save
+        b-navbar-nav
+          span (c) 2018 streamliner18, qianxiaoyu
+      br
+      b-alert(variant='warning' :show='loadWarningAlert' dismissible @dismissed='loadWarningAlert=false')
+        | Oops. Did you select the correct file? It should end with .json.
+      b-alert(variant='success' :show='loadSuccessAlert' dismissible @dismissed='loadSuccessAlert=true')
+        | Hooray, it just finished loading.
     b-col(cols=8)
       b-card(header='Graph')
+        template(slot='header')
         div#target
         .color-group
           div(v-for='i in colors' :key='i[0]')
@@ -39,12 +56,14 @@
 <script>
 import * as d3 from 'd3'
 import {petersenRelPos, edges, defaultMap} from './graph-util'
+import { TSExternalModuleReference } from 'babel-types';
 export default {
   name: 'graphView',
   props: ['mat'],
   data: () => ({
     matrix: this.mat,
     colors: [],
+    uploadFile: '',
     radius: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
     labels: defaultMap,
     showRadModal: false,
@@ -53,7 +72,9 @@ export default {
     radModalIdx: 0,
     edgeModalVal: '',
     radModalNodeNum: 0,
-    edgeModalNodes: [3, 5]
+    edgeModalNodes: [3, 5],
+    loadWarningAlert: false,
+    loadSuccessAlert: false
   }),
   methods: {
     initStar () {
@@ -142,6 +163,47 @@ export default {
         this.$root.$emit('bv::hide::modal', 'rForm')
         this.setNodeVal()
       }
+    },
+    downloadJSON (e) {
+      let data = {
+        matrix: this.mat,
+        labels: this.$data.labels,
+        radius: this.$data.radius
+      }
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+      let downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr)
+      downloadAnchorNode.setAttribute('download', "peters3n_data.json")
+      downloadAnchorNode.click()
+      downloadAnchorNode.remove()
+    },
+    uploadJSON (e) {
+      let file = this.$data.uploadFile
+      if (!file) {
+        this.$data.loadWarningAlert = true
+        return
+      }
+      let reader = new FileReader()
+      reader.onload = e => {
+        this.loadJSON(reader.result)
+      }
+      try {
+        reader.readAsText(file)
+      } catch(e) {
+        this.$data.loadWarningAlert = true
+      }
+    },
+    loadJSON (text) {
+      if (!text) {
+        this.$data.loadWarningAlert = true
+        return
+      }
+      let {labels, matrix, radius} = JSON.parse(text)
+      this.$data.radius = radius
+      this.$data.labels = labels
+      this.$emit('bulk', matrix)
+      this.$data.loadSuccessAlert = true
+      console.log(this.$data)
     }
   },
   mounted () {

@@ -1,6 +1,6 @@
 <template lang="pug">
   b-container
-    graph-view(:mat='mat' @set='setField')
+    graph-view(:mat='mat' @set='setField' @bulk='bulkSet')
     br
     b-row
       mat-view(:data='mat' @set='setField')
@@ -21,6 +21,9 @@ export default {
       this.$data.mat[i][j] = v
       this.$data.mat[j][i] = v
       this.$data.mat = Array(...this.$data.mat)
+    },
+    bulkSet (data) {
+      this.$data.mat = data
     }
   }
 }
